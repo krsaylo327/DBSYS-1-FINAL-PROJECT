@@ -1,3 +1,0 @@
-Video demo link: https://drive.google.com/file/d/1Z3HMGzkFMSzG4zXOeMx_3Ttb_SVE1ohV/view?usp=sharing
-
-Quick note: The video's a bit too big to upload directly to GitHub 'cause of file size limits. So, I stuck it on Google Drive instead! Should be easy to stream or download from there. Let me know if you have any trouble viewing it!
