@@ -1,0 +1,242 @@
+﻿-- Create the database
+CREATE DATABASE movie_rental_system;
+
+
+
+-- Table Creation
+
+-- Create Genres table
+CREATE TABLE Genres (
+ genre_id INT AUTO_INCREMENT PRIMARY KEY,
+ genre_name VARCHAR(50) NOT NULL UNIQUE, description TEXT 
+); 
+
+-- Create Movies table 
+CREATE TABLE Movies ( 
+movie_id INT AUTO_INCREMENT PRIMARY KEY,
+ title VARCHAR(100) NOT NULL,
+ genre_id INT NOT NULL,
+ release_year INT,
+ director VARCHAR(100),
+ duration_minutes INT, 
+daily_rental_rate DECIMAL(5,2) NOT NULL, 
+stock_quantity INT NOT NULL DEFAULT 1,
+ available_quantity INT NOT NULL,
+ CHECK (available_quantity <= stock_quantity),
+ CHECK (available_quantity >= 0), FOREIGN KEY (genre_id) REFERENCES Genres(genre_id), UNIQUE (title, release_year) 
+); 
+
+-- Create Customers table 
+CREATE TABLE Customers ( 
+customer_id INT AUTO_INCREMENT PRIMARY KEY,
+ first_name VARCHAR(50) NOT NULL,
+ last_name VARCHAR(50) NOT NULL,
+ email VARCHAR(100) NOT NULL UNIQUE,
+ phone VARCHAR(20), 
+address TEXT, registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
+ referred_by INT, 
+FOREIGN KEY (referred_by) REFERENCES Customers(customer_id) 
+); 
+
+-- Create Rentals table 
+CREATE TABLE Rentals ( 
+rental_id INT AUTO_INCREMENT PRIMARY KEY, 
+customer_id INT NOT NULL,
+ movie_id INT NOT NULL,
+ rental_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ return_date DATETIME,
+ due_date DATETIME NOT NULL,
+ rental_status ENUM('Rented', 'Returned', 'Overdue') NOT NULL DEFAULT 'Rented', total_charge DECIMAL(7,2), FOREIGN KEY (customer_id) REFERENCES Customers(customer_id), FOREIGN KEY (movie_id) REFERENCES Movies(movie_id), CHECK (return_date IS NULL OR return_date >= rental_date) 
+); 
+
+-- Create Payments table
+ CREATE TABLE Payments (
+ payment_id INT AUTO_INCREMENT PRIMARY KEY,
+ rental_id INT NOT NULL, 
+amount DECIMAL(7,2) NOT NULL,
+ payment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+payment_method ENUM('Credit Card', 'Debit Card', 'PayPal', 'Cash') NOT NULL, 
+transaction_status ENUM('Pending', 'Completed', 'Failed') NOT NULL DEFAULT 'Completed', FOREIGN KEY (rental_id) REFERENCES Rentals(rental_id), 
+UNIQUE (rental_id)
+ );
+
+
+
+
+--Data Insertion
+
+
+-- Insert sample genres 
+INSERT INTO Genres (genre_name, description)
+ VALUES ('Action', 'High-energy physical stunts and chases'),
+ ('Comedy', 'Funny and humorous stories'), 
+('Drama', 'Serious, character-driven stories'),
+ ('Sci-Fi', 'Futuristic, science-based themes'),
+ ('Horror', 'Designed to frighten and panic'); 
+
+-- Insert sample movies 
+INSERT INTO Movies (title, genre_id, release_year, director, duration_minutes, daily_rental_rate, stock_quantity, available_quantity) 
+VALUES ('The Matrix', 4, 1999, 'Lana Wachowski', 136, 2.99, 5, 5), 
+('Inception', 4, 2010, 'Christopher Nolan', 148, 3.49, 3, 3),
+ ('The Dark Knight', 1, 2008, 'Christopher Nolan', 152, 3.99, 4, 4),
+ ('Superbad', 2, 2007, 'Greg Mottola', 113, 1.99, 2, 2),
+ ('The Shawshank Redemption', 3, 1994, 'Frank Darabont', 142, 2.49, 3, 3),
+ ('Get Out', 5, 2017, 'Jordan Peele', 104, 2.99, 3, 3), 
+('Mad Max: Fury Road', 1, 2015, 'George Miller', 120, 3.49, 2, 2), 
+('Parasite', 3, 2019, 'Bong Joon Ho', 132, 3.99, 4, 4),
+ ('Interstellar', 4, 2014, 'Christopher Nolan', 169, 3.99, 3, 3), 
+('The Hangover', 2, 2009, 'Todd Phillips', 100, 2.49, 3, 3); 
+
+-- Insert sample customers 
+INSERT INTO Customers (first_name, last_name, email, phone, address, registration_date, referred_by) 
+VALUES ('Minji', 'Kim', 'minji.njz@email.com', '555-0111', 'Busan, South Korea', '2023-01-15', NULL),
+('Hanni', 'Pham', 'hanni.nwjns@email.com', '555-0112', 'Ho Chi Minh, Vietnam', '2023-02-20', 1),
+('Danielle', 'Marsh', 'danielle.newjeans@email.com', '555-0113', 'Newcastle, Australia', '2023-03-10', 1),
+('Haerin', 'Kang', 'haerin.nj@email.com', '555-0114', 'Seoul, South Korea', '2023-04-05', 2),
+('Hyein', 'Lee', 'hyein.njeans@email.com', '555-0115', 'Incheon, South Korea', '2023-05-12', NULL),
+('Sakura', 'Miyawaki', 'sakura.ls@email.com', '555-0116', 'Kagoshima, Japan', '2023-06-18', 3),
+('Chaewon', 'Kim', 'chaewon.lsserafim@email.com', '555-0117', 'Daegu, South Korea', '2023-07-22', 2),
+('Yunjin', 'Huh', 'yunjin.lesserafim@email.com', '555-0118', 'New York, USA', '2023-08-30', NULL),
+('Kazuha', 'Nakamura', 'kazuha.sserafim@email.com', '555-0119', 'Kyoto, Japan', '2023-09-14', 5),
+('Eunchae', 'Hong', 'eunchae.ls@email.com', '555-0120', 'Daejeon, South Korea', '2023-10-25', 4);
+
+-- Insert sample rentals
+INSERT INTO Rentals (customer_id, movie_id, rental_date, return_date, due_date, rental_status, total_charge) 
+VALUES (1, 1, '2023-11-01 14:30:00', '2023-11-03 16:45:00', '2023-11-04 14:30:00', 'Returned', 5.98),
+ (2, 3, '2023-11-02 10:15:00', NULL, '2023-11-06 10:15:00', 'Rented', 3.99), 
+(3, 5, '2023-11-03 18:20:00', '2023-11-05 12:10:00', '2023-11-06 18:20:00', 'Returned', 4.98),
+ (4, 7, '2023-11-04 11:45:00', NULL, '2023-11-07 11:45:00', 'Rented', 3.49), 
+(5, 2, '2023-11-05 16:30:00', '2023-11-08 09:20:00', '2023-11-08 16:30:00', 'Returned', 10.47),
+ (6, 4, '2023-11-06 13:10:00', NULL, '2023-11-09 13:10:00', 'Rented', 1.99), 
+(7, 6, '2023-11-07 19:25:00', '2023-11-10 14:15:00', '2023-11-10 19:25:00', 'Returned', 8.97), 
+(8, 8, '2023-11-08 12:40:00', NULL, '2023-11-11 12:40:00', 'Rented', 3.99), 
+(9, 10, '2023-11-09 15:50:00', '2023-11-12 11:30:00', '2023-11-12 15:50:00', 'Returned', 7.47), 
+(10, 9, '2023-11-10 17:35:00', NULL, '2023-11-13 17:35:00', 'Rented', 3.99); 
+
+-- Insert sample payments 
+INSERT INTO Payments (rental_id, amount, payment_date, payment_method, transaction_status)
+ VALUES (1, 5.98, '2023-11-01 14:35:00', 'Credit Card', 'Completed'), 
+(3, 4.98, '2023-11-03 18:25:00', 'Debit Card', 'Completed'),
+ (5, 10.47, '2023-11-05 16:35:00', 'PayPal', 'Completed'),
+ (7, 8.97, '2023-11-07 19:30:00', 'Credit Card', 'Completed'),
+ (9, 7.47, '2023-11-09 15:55:00', 'Debit Card', 'Completed');
+
+
+
+
+-- Create indexes for performance optimization 
+CREATE INDEX idx_movie_title ON Movies(title); 
+CREATE INDEX idx_customer_name ON Customers(last_name, first_name); 
+CREATE INDEX idx_rental_status ON Rentals(rental_status); 
+CREATE INDEX idx_rental_dates ON Rentals(rental_date, return_date, due_date);
+
+
+
+
+-- Procedure to process a new rental 
+DELIMITER // 
+CREATE PROCEDURE ProcessNewRental( 
+IN p_customer_id INT, 
+IN p_movie_id INT, 
+IN p_rental_days INT, 
+IN p_payment_method VARCHAR(20) 
+)
+BEGIN
+ DECLARE v_daily_rate DECIMAL(5,2); 
+DECLARE v_total_charge DECIMAL(7,2);
+ DECLARE v_available INT; 
+DECLARE v_rental_id INT; 
+SELECT available_quantity, daily_rental_rate INTO v_available, v_daily_rate FROM Movies WHERE movie_id = p_movie_id;
+ IF v_available < 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Movie not available for rental'; END IF; 
+SET v_total_charge = p_rental_days * v_daily_rate; 
+START TRANSACTION; 
+INSERT INTO Rentals (customer_id, movie_id, rental_date, due_date, rental_status, total_charge) VALUES (p_customer_id, p_movie_id, NOW(), DATE_ADD(NOW(), INTERVAL p_rental_days DAY), 'Rented', v_total_charge);
+ SET v_rental_id = LAST_INSERT_ID(); 
+INSERT INTO Payments (rental_id, amount, payment_date, payment_method, transaction_status) VALUES (v_rental_id, v_total_charge, NOW(), p_payment_method, 'Completed'); 
+UPDATE Movies SET available_quantity = available_quantity - 1 WHERE movie_id = p_movie_id;
+ COMMIT; 
+SELECT CONCAT('Rental processed successfully. Rental ID: ', v_rental_id) AS message; 
+END // 
+DELIMITER ; 
+
+
+-- Procedure to process a return 
+DELIMITER // 
+CREATE PROCEDURE ProcessReturn( IN p_rental_id INT
+) 
+BEGIN 
+DECLARE v_movie_id INT; 
+DECLARE v_due_date DATETIME;
+ DECLARE v_status VARCHAR(20); 
+SELECT movie_id, due_date, rental_status INTO v_movie_id, v_due_date, v_status FROM Rentals WHERE rental_id = p_rental_id; 
+IF v_status != 'Rented' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Movie already returned or not rented'; 
+END IF; 
+START TRANSACTION; 
+UPDATE Rentals SET return_date = NOW(), rental_status = IF(NOW() > v_due_date, 'Overdue', 'Returned'),
+is_active = FALSE
+WHERE rental_id = p_rental_id; 
+UPDATE Movies SET available_quantity = available_quantity + 1 WHERE movie_id = v_movie_id;
+ COMMIT; 
+SELECT CONCAT('Return processed successfully for Rental ID: ', p_rental_id) AS message; 
+END // 
+DELIMITER ;
+
+
+
+-- Trigger to update rental status when overdue 
+DELIMITER // 
+CREATE TRIGGER check_overdue_rentals BEFORE UPDATE ON Rentals FOR EACH ROW BEGIN IF NEW.return_date IS NOT NULL AND NEW.return_date > NEW.due_date THEN SET NEW.rental_status = 'Overdue'; END IF;
+ END // 
+DELIMITER ; 
+
+
+-- Trigger to validate movie availability before rental 
+DELIMITER //
+ CREATE TRIGGER validate_movie_availability BEFORE INSERT ON Rentals FOR EACH ROW BEGIN DECLARE available_qty INT; 
+SELECT available_quantity INTO available_qty FROM Movies WHERE movie_id = NEW.movie_id; 
+IF available_qty < 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Movie not available for rental'; 
+END IF;
+ END // 
+DELIMITER ;
+
+
+
+-- EXAMPLE QUERIES
+
+-- 1. Find currently rented movies 
+SELECT m.title, c.first_name, c.last_name, r.rental_date, r.due_date 
+FROM Rentals r JOIN Movies m ON r.movie_id = m.movie_id JOIN Customers c ON r.customer_id = c.customer_id WHERE r.rental_status = 'Rented';
+
+-- 2. Find late returns 
+SELECT m.title, c.first_name, c.last_name, r.rental_date, r.due_date, r.return_date
+ FROM Rentals r JOIN Movies m ON r.movie_id = m.movie_id JOIN Customers c ON r.customer_id = c.customer_id WHERE r.rental_status = 'Overdue';
+
+-- 3. Top rented genres 
+SELECT g.genre_name, COUNT(r.rental_id) AS rental_count 
+FROM Rentals r JOIN Movies m ON r.movie_id = m.movie_id JOIN Genres g ON m.genre_id = g.genre_id GROUP BY g.genre_name ORDER BY rental_count DESC;
+
+-- 4. Revenue reports by genre with ROLLUP 
+SELECT IFNULL(g.genre_name, 'TOTAL') AS genre, 
+SUM(p.amount) AS total_revenue FROM Payments p JOIN Rentals r ON p.rental_id = r.rental_id JOIN Movies m ON r.movie_id = m.movie_id JOIN Genres g ON m.genre_id = g.genre_id GROUP BY g.genre_name WITH ROLLUP;
+
+-- 5. Top 10 rented movies 
+SELECT m.title, COUNT(r.rental_id) AS rental_count FROM Rentals r JOIN Movies m ON r.movie_id = m.movie_id GROUP BY m.title ORDER BY rental_count DESC LIMIT 10;
+
+-- 6. Customers who referred other customers (self-join) 
+SELECT c1.first_name AS referrer_first, c1.last_name AS referrer_last, c2.first_name AS referred_first, c2.last_name AS referred_last FROM Customers c1 JOIN Customers c2 ON c1.customer_id = c2.referred_by;
+
+-- 7. Search movies with wildcards 
+SELECT * FROM Movies WHERE title LIKE '%the%' OR director LIKE '%nolan%';
+
+-- 8. Complex WHERE clause with AND/OR/NOT 
+SELECT m.title, g.genre_name, m.release_year FROM Movies m JOIN Genres g ON m.genre_id = g.genre_id WHERE (g.genre_name = 'Sci-Fi' OR g.genre_name = 'Action') AND m.release_year >= 2000 AND NOT m.director = 'George Miller';
+
+-- 9. Customers who rented all movies of a particular genre (subquery) 
+SELECT c.first_name, c.last_name FROM Customers c WHERE NOT EXISTS ( SELECT m.movie_id FROM Movies m WHERE m.genre_id = (SELECT genre_id FROM Genres WHERE genre_name = 'Sci-Fi') AND NOT EXISTS ( SELECT r.rental_id FROM Rentals r WHERE r.customer_id = c.customer_id AND r.movie_id = m.movie_id ) );
+
+-- 10. Transaction example for rental processing 
+START TRANSACTION; 
+SELECT available_quantity FROM Movies WHERE movie_id = 3 LIMIT 1 FOR UPDATE; 
+INSERT INTO Rentals (customer_id, movie_id, rental_date, due_date, rental_status, total_charge) VALUES (5, 3, NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), 'Rented', 11.97); 
+INSERT INTO Payments (rental_id, amount, payment_date, payment_method, transaction_status) VALUES (LAST_INSERT_ID(), 11.97, NOW(), 'Credit Card', 'Completed'); 
+UPDATE Movies SET available_quantity = available_quantity - 1 WHERE movie_id = 3; COMMIT;
