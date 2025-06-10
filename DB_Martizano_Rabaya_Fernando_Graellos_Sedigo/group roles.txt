@@ -1,0 +1,14 @@
+Neña Jezza Fernando – Project Manager & Coordinator
+Oversees the entire project timeline, coordinates team meetings, ensures milestones and deadlines are met, and facilitates communication among members. 
+
+James John Martizano – Database Designer
+Leads the design of the database schema, including normalization, primary/foreign keys, constraints, and ER diagrams. Responsible for indexing strategies and database performance optimization.
+
+Paula Blanch Graellos – SQL Developer
+develops SQL scripts, including table creation, constraints, advanced queries, triggers, stored procedures, and data manipulation commands (INSERT, UPDATE, DELETE). Works closely with the Database Designer to implement and test database logic.
+
+Desiree Sedigo – Data Analyst
+Creates realistic sample data sets, tests SQL queries for accuracy and performance, verifies data integrity, and validates business logic through query results. Supports debugging and ensures data consistency.
+
+Ryan Neil Rabaya – Documenter & Frontend Developer
+Prepares presentation materials and documentation of the project workflow and deliverables. Develops and maintains the PHP and Bootstrap frontend interface, including CRUD operations and report views. Leads the live demo walkthrough.
