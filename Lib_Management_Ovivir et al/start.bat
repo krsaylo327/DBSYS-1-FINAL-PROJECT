@@ -1,0 +1,1 @@
+@c:/php-dev/php.exe -S localhost:1024
